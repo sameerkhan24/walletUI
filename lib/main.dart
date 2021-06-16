@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:walletui/data.dart';
 import 'package:walletui/widgets/header.dart';
@@ -36,7 +39,7 @@ class HomePage extends StatelessWidget {
             child: const WalletHeader(),
           ),
           const Expanded(child: NewCardSection()),
-          Expanded(child: Container())
+          Expanded(child: ExpenseSection())
         ],
       ),
     );
@@ -189,4 +192,108 @@ class CardDetails extends StatelessWidget {
       ),
     );
   }
+}
+
+class ExpenseSection extends StatelessWidget {
+  const ExpenseSection({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Monthly Expenses',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)),
+        Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20,vertical: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: expenses.map((value) => Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 5,
+                          backgroundColor: pieColors[expenses.indexOf(value)],
+                        ),
+                        SizedBox(width: 5,),
+                        Text(value['name'],
+                        style: TextStyle(fontSize: 18),
+                        )
+                      ],
+                    ),
+                  )).toList(),
+                ),
+              ),
+              ),
+              Expanded(
+                flex: 6,
+                child: PieChart(),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class PieChart extends StatelessWidget {
+  const PieChart({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right:5),
+      child: Container(
+        height: 200,
+        width: 200,
+        decoration: BoxDecoration(shape: BoxShape.circle,boxShadow: customShadow,color: primaryColor),
+        child: Stack(
+          children: [
+            // ignore: prefer_const_constructors
+            CustomPaint(
+              foregroundPainter: PieChartPainter(),
+            ),
+            Center(
+              child: Container(
+        height: 70,
+        width: 70,
+        decoration: BoxDecoration(shape: BoxShape.circle,boxShadow: customShadow,color: primaryColor),
+              ),
+            ),
+        
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PieChartPainter extends CustomPainter{
+  @override
+  void paint(Canvas canvas, Size size) {
+    Offset center = Offset(size.width/2,size.height/2);
+    double radius = min(size.width/2,size.height/2);
+    var paint = new Paint()..style=PaintingStyle.stroke..strokeWidth=100;
+    double total=0;
+    for (var element in expenses) {total+=element['amount'];}
+    var startRadian = -pi/2;
+    for(int i=0;i<expenses.length;i++){
+      var currentExpense = expenses[i];
+      var sweepRadian = (currentExpense['amount']/total)*2*pi;
+      paint.color=pieColors[i];
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+  
 }
