@@ -288,6 +288,8 @@ class PieChartPainter extends CustomPainter{
       var currentExpense = expenses[i];
       var sweepRadian = (currentExpense['amount']/total)*2*pi;
       paint.color=pieColors[i];
+      canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startRadian, sweepRadian, false, paint);
+      startRadian+=sweepRadian;
     }
   }
 
